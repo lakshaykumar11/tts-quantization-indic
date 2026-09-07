@@ -1,27 +1,27 @@
-# Quantization and Multilingual TTS
+## FP32 baseline (300 rows, Tesla T4)
 
-Measuring how post-training weight quantization degrades TTS 
-quality differently across English, Hindi, and code-mixed 
-(Hinglish) speech.
+| Condition | WER | CER |
+|---|---|---|
+| English | 0.004 | 0.004 |
+| Hindi | 0.229 | 0.096 |
+| Hinglish (mixed script) | 0.382 | 0.213 |
+| Hinglish (romanized) | 0.595 | 0.198 |
 
-## Setup
-- TTS: XTTS-v2 (coqui-tts fork)
-- ASR: Whisper large-v3
-- Hardware: Tesla T4 (Colab)
+All pairwise differences significant: EN→HI p=1.1e-17, 
+HI→MIX p=1.9e-03, MIX→ROM p=1.9e-12.
 
-## Test set
-200 sentences: 50 EN, 50 HI (parallel translations), 
-100 Hinglish in both mixed-script and romanized form.
-CMI computed per sentence; three mixing levels (mean 11 / 24 / 41).
+Sentences with at least one error: EN 2/50, HI 47/50, 
+MIX 95/100, ROM 100/100.
+
+CMI showed no correlation with baseline WER 
+(HING_MIX r=0.156, p=0.12; HING_ROM r=0.030, p=0.77). 
+The trend observed in the 6-sentence pilot did not 
+survive at n=100.
 
 ## Status
-- [x] Pipeline + scoring
-- [x] Test set built and validated
+- [x] Pipeline, scoring, test set
 - [x] Pilot: language tag selection
-- [ ] FP32 baseline (300 rows)
-- [ ] Quantized runs (FP16 / INT8 / INT4)
-
-## Notes
-Whisper transcribes to Devanagari regardless of input script, 
-so romanized references need script-neutral comparison. Naive WER 
-reports total failure on intelligible output.
+- [x] FP32 baseline
+- [ ] FP16
+- [ ] INT8
+- [ ] INT4
