@@ -1,27 +1,31 @@
-## FP32 baseline (300 rows, Tesla T4)
+## FP16 vs FP32 (paired, n=300)
 
-| Condition | WER | CER |
+| Condition | FP32 WER | FP16 WER | Δ | p |
+|---|---|---|---|---|
+| English | 0.004 | 0.009 | +0.005 | 0.18 |
+| Hindi | 0.229 | 0.242 | +0.013 | 0.47 |
+| Hinglish (mixed) | 0.382 | 0.360 | −0.022 | 0.13 |
+| Hinglish (romanized) | 0.595 | 0.591 | −0.003 | 0.88 |
+
+No significant quality change in any condition (Wilcoxon 
+signed-rank). FP16 does not disproportionately affect Indic 
+or code-mixed speech.
+
+### Speed
+
+| | RTF | Synthesis time |
 |---|---|---|
-| English | 0.004 | 0.004 |
-| Hindi | 0.229 | 0.096 |
-| Hinglish (mixed script) | 0.382 | 0.213 |
-| Hinglish (romanized) | 0.595 | 0.198 |
+| FP32 | 4.60 | ~24 s |
+| FP16 | 0.62 | ~3.3 s |
 
-All pairwise differences significant: EN→HI p=1.1e-17, 
-HI→MIX p=1.9e-03, MIX→ROM p=1.9e-12.
+7.5x speedup, uniform across all four conditions. FP16 crosses 
+the real-time threshold (RTF < 1); FP32 does not.
 
-Sentences with at least one error: EN 2/50, HI 47/50, 
-MIX 95/100, ROM 100/100.
-
-CMI showed no correlation with baseline WER 
-(HING_MIX r=0.156, p=0.12; HING_ROM r=0.030, p=0.77). 
-The trend observed in the 6-sentence pilot did not 
-survive at n=100.
+FP16 uses autocast (fp32 weights, fp16 compute) — pure .half() 
+fails on XTTS-v2 due to internally-constructed fp32 tensors.
 
 ## Status
-- [x] Pipeline, scoring, test set
-- [x] Pilot: language tag selection
 - [x] FP32 baseline
-- [ ] FP16
+- [x] FP16
 - [ ] INT8
 - [ ] INT4
